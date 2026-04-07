@@ -1,0 +1,18 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active:
+  datasource:
+    url: jdbc:mysql://localhost/expensedb
+    username: root
+    password: Pas$4MyLocalSQL
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      dialect: org.hibernate.dialect.MySQLDialect
+    show-sql: true
