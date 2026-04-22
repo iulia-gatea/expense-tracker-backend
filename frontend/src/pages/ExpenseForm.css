@@ -1,0 +1,65 @@
+.expense-form-container {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.expense-form-card {
+  background-color: var(--background-color);
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 4px 6px var(--shadow);
+  width: 100%;
+  max-width: 500px;
+}
+
+.expense-form-card h1 {
+  text-align: center;
+  color: var(--primary-color);
+  margin-bottom: 30px;
+  font-size: 28px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.loading-container {
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.loading-container p {
+  margin-top: 15px;
+  color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .expense-form-container {
+    padding: 10px;
+  }
+
+  .expense-form-card {
+    padding: 20px;
+  }
+
+  .expense-form-card h1 {
+    font-size: 24px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+  }
+}
