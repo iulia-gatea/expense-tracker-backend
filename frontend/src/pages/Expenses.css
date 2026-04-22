@@ -1,0 +1,138 @@
+.expenses {
+  padding: 20px 0;
+}
+
+.expenses-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.expenses-header h1 {
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.filters {
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px var(--shadow);
+}
+
+.filters h3 {
+  color: var(--primary-color);
+  margin-bottom: 15px;
+}
+
+.filter-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  align-items: end;
+}
+
+.expenses-table-container {
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px var(--shadow);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.btn-small {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.expenses-summary {
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 2px 4px var(--shadow);
+}
+
+.expenses-summary h3 {
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
+
+.expenses-summary p {
+  margin: 5px 0;
+  color: var(--text-color);
+}
+
+.empty-state {
+  text-align: center;
+  color: #666;
+  padding: 60px 20px;
+}
+
+.empty-state a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.empty-state a:hover {
+  text-decoration: underline;
+}
+
+.loading-container {
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.loading-container p {
+  margin-top: 15px;
+  color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .expenses-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+
+  .filter-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .table {
+    font-size: 14px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .btn-small {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .expenses {
+    padding: 10px 0;
+  }
+
+  .filters {
+    padding: 15px;
+  }
+
+  .expenses-summary {
+    padding: 15px;
+  }
+}

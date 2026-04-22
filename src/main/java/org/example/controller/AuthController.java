@@ -8,11 +8,13 @@ import org.example.service.AuthService;
 import org.example.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@CrossOrigin(origins = "*")
 public class AuthController {
 
     public AuthController(AuthService authService) {
@@ -26,7 +28,7 @@ public class AuthController {
             @RequestBody AppUserDTO appUserDTO) {
         AuthResponseDTO response = authService.registerUser(appUserDTO);
 
-        if("success".equals(response.getMessage())){
+        if("success".equalsIgnoreCase(response.getMessage())){
             return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.badRequest().body(response);
@@ -38,7 +40,7 @@ public class AuthController {
             @RequestBody AuthDTO authDTO) {
         AuthResponseDTO response = authService.loginUser(authDTO);
 
-        if("success".equals(response.getMessage())){
+        if("success".equalsIgnoreCase(response.getMessage())){
             return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.badRequest().body(response);
