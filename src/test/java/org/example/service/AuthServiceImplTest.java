@@ -36,6 +36,9 @@ public class AuthServiceImplTest {
     @Mock
     private JwtUtil jwtUtil;
 
+    @Mock
+    private CategoryService categoryService;
+
     @InjectMocks
     private AuthServiceImpl authService;
 
