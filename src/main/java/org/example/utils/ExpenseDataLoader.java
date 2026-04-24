@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+
 public class ExpenseDataLoader {
 
     private static List<Expense> expenses = new ArrayList<>();

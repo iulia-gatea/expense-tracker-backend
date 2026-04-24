@@ -12,7 +12,8 @@ const Expenses = () => {
   const [filters, setFilters] = useState({
     category: '',
     date: '',
-    month: ''
+    month: '',
+    expenseType: ''
   });
 
   useEffect(() => {
@@ -44,7 +45,7 @@ const Expenses = () => {
     let filtered = [...expenses];
 
     if (filters.category) {
-      filtered = filtered.filter(expense => expense.category === filters.category);
+      filtered = filtered.filter(expense => expense.category.name === filters.category);
     }
 
     if (filters.date) {
@@ -53,6 +54,10 @@ const Expenses = () => {
 
     if (filters.month) {
       filtered = filtered.filter(expense => expense.date.startsWith(filters.month));
+    }
+
+    if (filters.expenseType !== '') {
+      filtered = filtered.filter(expense => expense.expenseType === parseInt(filters.expenseType));
     }
 
     setFilteredExpenses(filtered);
@@ -70,7 +75,8 @@ const Expenses = () => {
     setFilters({
       category: '',
       date: '',
-      month: ''
+      month: '',
+      expenseType: ''
     });
   };
 
@@ -90,6 +96,32 @@ const Expenses = () => {
     return date.toLocaleDateString();
   };
 
+  const getExpenseTypeLabel = (type) => {
+    return type === 0 ? 'Expense' : 'Income';
+  };
+
+  const getRowClassName = (expenseType) => {
+    return expenseType === 0 ? 'expense-row' : 'income-row';
+  };
+
+  const calculateSummary = () => {
+    const expenses = filteredExpenses.filter(e => e.expenseType === 0);
+    const income = filteredExpenses.filter(e => e.expenseType === 1);
+
+    const totalExpenses = expenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+    const totalIncome = income.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+
+    return {
+      totalExpenses,
+      totalIncome,
+      net: totalIncome - totalExpenses,
+      expenseCount: expenses.length,
+      incomeCount: income.length
+    };
+  };
+
+  const summary = calculateSummary();
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -102,9 +134,9 @@ const Expenses = () => {
   return (
     <div className="expenses">
       <div className="expenses-header">
-        <h1>All Expenses</h1>
+        <h1>All Transactions</h1>
         <Link to="/expenses/add" className="btn btn-primary">
-          Add New Expense
+          Add New Transaction
         </Link>
       </div>
 
@@ -116,8 +148,22 @@ const Expenses = () => {
 
       {/* Filters */}
       <div className="filters">
-        <h3>Filter Expenses</h3>
+        <h3>Filter Transactions</h3>
         <div className="filter-controls">
+          <div className="form-group">
+             <label htmlFor="expenseType">Type</label>
+                <select
+                      id="expenseType"
+                      name="expenseType"
+                      value={filters.expenseType}
+                      onChange={handleFilterChange}
+                >
+                  <option value="">All Types</option>
+                  <option value="0">Expense</option>
+                  <option value="1">Income</option>
+                </select>
+          </div>
+
           <div className="form-group">
             <label htmlFor="category">Category</label>
             <select
@@ -155,9 +201,12 @@ const Expenses = () => {
             />
           </div>
 
+        <div className="form-group">
+            <label>&nbsp;</label>
           <button onClick={clearFilters} className="btn btn-secondary">
             Clear Filters
           </button>
+        </div>
         </div>
       </div>
 
@@ -173,6 +222,7 @@ const Expenses = () => {
               <tr>
                 <th>Date</th>
                 <th>Category</th>
+                <th>Type</th>
                 <th>Amount</th>
                 <th>Account</th>
                 <th>Note</th>
@@ -181,9 +231,14 @@ const Expenses = () => {
             </thead>
             <tbody>
               {filteredExpenses.map(expense => (
-                <tr key={expense.id}>
+                <tr key={expense.id} className={getRowClassName(expense.expenseType)}>
                   <td>{formatDate(expense.date)}</td>
-                  <td>{expense.category}</td>
+                  <td>{expense.category.name}</td>
+                  <td>
+                    <span className="type-badge" data-type={expense.expenseType}>
+                      {getExpenseTypeLabel(expense.expenseType)}
+                    </span>
+                  </td>
                   <td>${parseFloat(expense.amount).toFixed(2)}</td>
                   <td>{expense.account || '-'}</td>
                   <td>{expense.note || '-'}</td>
@@ -214,12 +269,25 @@ const Expenses = () => {
       {filteredExpenses.length > 0 && (
         <div className="expenses-summary">
           <h3>Summary</h3>
-          <p>
-            Total Expenses: <strong>${filteredExpenses.reduce((total, expense) => total + parseFloat(expense.amount || 0), 0).toFixed(2)}</strong>
-          </p>
-          <p>
-            Number of Transactions: <strong>{filteredExpenses.length}</strong>
-          </p>
+          <div className="summary-grid">
+            <div className="summary-card">
+              <h4>Expenses</h4>
+              <p className="summary-amount">${summary.totalExpenses.toFixed(2)}</p>
+              <p className="summary-count">{summary.expenseCount} transaction{summary.expenseCount !== 1 ? 's' : ''}</p>
+            </div>
+            <div className="summary-card">
+              <h4>Income</h4>
+              <p className="summary-amount income">${summary.totalIncome.toFixed(2)}</p>
+              <p className="summary-count">{summary.incomeCount} transaction{summary.incomeCount !== 1 ? 's' : ''}</p>
+            </div>
+            <div className="summary-card">
+              <h4>Net</h4>
+              <p className={`summary-amount ${summary.net >= 0 ? 'income' : 'expense'}`}>
+                ${summary.net.toFixed(2)}
+              </p>
+              <p className="summary-label">Income - Expenses</p>
+            </div>
+          </div>
         </div>
       )}
     </div>

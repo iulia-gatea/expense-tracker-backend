@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.example.model.Category;
 import org.example.model.Expense;
 import org.example.repository.ExpenseRepository;
 import org.springframework.stereotype.Service;
@@ -29,14 +30,14 @@ public class ExpenseServiceImpl implements ExpenseService{
     }
 
     @Override
-    public List<Expense> getExpenseByCategoryAndMonth(String category, String month, Long userId) {
+    public List<Expense> getExpenseByCategoryIdAndMonth(Long categoryId, String month, Long userId) {
         return expenseRepository.findByUserIdOrderByDateDesc(userId).stream()
-                .filter(expense -> expense.getCategory().equalsIgnoreCase(category) &&
+                .filter(expense -> expense.getCategory().getId().equals(categoryId) &&
                         expense.getDate().startsWith(month)).toList();
     }
 
     @Override
-    public List<String> getAllExpenseCategories(Long userId) {
+    public List<Category> getAllExpenseCategories(Long userId) {
         return expenseRepository.findByUserIdOrderByDateDesc(userId)
                 .stream()
                 .map(Expense::getCategory)
@@ -55,6 +56,11 @@ public class ExpenseServiceImpl implements ExpenseService{
     @Override
     public List<Expense> getAllUserExpenses(Long userId) {
         return expenseRepository.findByUserIdOrderByDateDesc(userId);
+    }
+
+    @Override
+    public List<Expense> getExpenseByType(Integer type, Long userId) {
+        return expenseRepository.findByExpenseTypeAndUserId(type, userId);
     }
 
     @Override

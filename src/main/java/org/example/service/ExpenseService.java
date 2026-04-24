@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.example.model.Category;
 import org.example.model.Expense;
 
 import java.util.List;
@@ -7,11 +8,11 @@ import java.util.Optional;
 
 public interface ExpenseService {
     List<Expense> getAllUserExpenses(Long userId);
-
+    List<Expense> getExpenseByType(Integer type, Long userId);
     List<Expense> getExpenseByDate(String date, Long userId);
-    List<Expense> getExpenseByCategoryAndMonth(
-            String category, String month, Long userId);
-    List<String> getAllExpenseCategories(Long userId);
+    List<Expense> getExpenseByCategoryIdAndMonth(
+            Long categoryId, String month, Long userId);
+    List<Category> getAllExpenseCategories(Long userId);
     Optional<Expense> getExpenseById(Long id, Long userId);
 
     Expense addExpense(Expense expense);

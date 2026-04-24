@@ -7,6 +7,15 @@
   padding: 20px;
 }
 
+.auth-logo {
+  text-align: center;
+}
+
+.auth-logo img {
+
+  height: auto;
+}
+
 .auth-card {
   background-color: var(--background-color);
   border-radius: 8px;
@@ -52,6 +61,10 @@
 
   .auth-card {
     padding: 30px 20px;
+  }
+
+  .auth-logo img {
+    max-width: 150px;
   }
 
   .auth-card h2 {

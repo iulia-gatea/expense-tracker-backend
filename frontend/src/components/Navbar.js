@@ -20,7 +20,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/dashboard" className="navbar-brand">
-          Expense Tracker
+          <img src="/logo.svg" alt="Expense Tracker" className="navbar-logo" />Expense Tracker
         </Link>
 
         <div className="navbar-menu">
@@ -28,10 +28,13 @@ const Navbar = () => {
             Dashboard
           </Link>
           <Link to="/expenses" className="navbar-link">
-            Expenses
+            Transactions
+          </Link>
+          <Link to="/categories" className="navbar-link">
+            Categories
           </Link>
           <Link to="/expenses/add" className="navbar-link">
-            Add Expense
+            Add Transaction
           </Link>
         </div>
 
