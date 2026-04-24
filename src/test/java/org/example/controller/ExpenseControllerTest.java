@@ -2,6 +2,7 @@ package org.example.controller;
 
 import org.example.dto.AuthResponseDTO;
 import org.example.model.AppUser;
+import org.example.model.Category;
 import org.example.model.Expense;
 import org.example.model.Role;
 import org.example.service.ExpenseService;
@@ -38,12 +39,19 @@ public class ExpenseControllerTest {
     @InjectMocks
     private ExpenseController expenseController;
 
+    private Category foodCategory;
+    private Category transportCategory;
     private AppUser testUser;
     private Expense testExpense1;
     private Expense testExpense2;
 
     @BeforeEach
     public void setUp() {
+        foodCategory = new Category();
+        foodCategory.setName("Food");
+        transportCategory = new Category();
+        transportCategory.setName("Transport");
+
         testUser = new AppUser();
         testUser.setId(1L);
         testUser.setUsername("testuser");
@@ -52,14 +60,14 @@ public class ExpenseControllerTest {
         testExpense1 = new Expense();
         testExpense1.setId(1L);
         testExpense1.setDate("2024-04-07");
-        testExpense1.setCategory("Food");
+        testExpense1.setCategory(foodCategory);
         testExpense1.setAmount(25.50);
         testExpense1.setUser(testUser);
 
         testExpense2 = new Expense();
         testExpense2.setId(2L);
         testExpense2.setDate("2024-04-06");
-        testExpense2.setCategory("Transport");
+        testExpense2.setCategory(transportCategory);
         testExpense2.setAmount(15.00);
         testExpense2.setUser(testUser);
     }
@@ -182,7 +190,7 @@ public class ExpenseControllerTest {
     @Test
     public void testGetAllExpenseCategories_ShouldReturnCategories() {
         // Arrange
-        List<String> categories = Arrays.asList("Food", "Transport");
+        List<Category> categories = Arrays.asList(foodCategory, transportCategory);
         when(authentication.getName()).thenReturn("testuser");
         when(userService.findByUsename("testuser")).thenReturn(testUser);
         when(expenseService.getAllExpenseCategories(1L)).thenReturn(categories);
@@ -235,18 +243,18 @@ public class ExpenseControllerTest {
         List<Expense> expenses = Arrays.asList(testExpense1);
         when(authentication.getName()).thenReturn("testuser");
         when(userService.findByUsename("testuser")).thenReturn(testUser);
-        when(expenseService.getExpenseByCategoryAndMonth("Food", "2024-04", 1L))
+        when(expenseService.getExpenseByCategoryIdAndMonth(1L, "2024-04", 1L))
                 .thenReturn(expenses);
 
         // Act
-        ResponseEntity<List<Expense>> response = expenseController.getExpenseByCategoryAndMonth(
-                "Food", "2024-04", authentication);
+        ResponseEntity<List<Expense>> response = expenseController.getExpenseByCategoryIdAndMonth(
+                1L, "2024-04", authentication);
 
         // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).hasSize(1);
-        assertThat(response.getBody().get(0).getCategory()).isEqualTo("Food");
-        verify(expenseService, times(1)).getExpenseByCategoryAndMonth("Food", "2024-04", 1L);
+        assertThat(response.getBody().get(0).getCategory().getName()).isEqualTo("Food");
+        verify(expenseService, times(1)).getExpenseByCategoryIdAndMonth(1L, "2024-04", 1L);
     }
 }
 

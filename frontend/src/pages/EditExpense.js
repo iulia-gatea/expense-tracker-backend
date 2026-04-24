@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { expenseService } from '../services/api';
+import { expenseService, categoryService } from '../services/api';
 import './ExpenseForm.css';
 
 const EditExpense = () => {
@@ -10,7 +10,8 @@ const EditExpense = () => {
     category: '',
     amount: '',
     account: '',
-    note: ''
+    note: '',
+    expenseType: '0'
   });
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -30,10 +31,11 @@ const EditExpense = () => {
       const expense = await expenseService.getExpenseById(id);
       setFormData({
         date: expense.date,
-        category: expense.category,
+        category: expense.category.id,
         amount: expense.amount,
         account: expense.account || '',
-        note: expense.note || ''
+        note: expense.note || '',
+        expenseType: expense.expenseType.toString()
       });
     } catch (err) {
       setError('Failed to load expense');
@@ -44,7 +46,7 @@ const EditExpense = () => {
 
   const loadCategories = async () => {
     try {
-      const categoriesData = await expenseService.getExpenseCategories();
+      const categoriesData = await categoryService.getAllCategories();
       setCategories(categoriesData);
     } catch (err) {
       // Categories are optional, so we don't set an error
@@ -78,9 +80,12 @@ const EditExpense = () => {
       }
 
       const expenseData = {
-        ...formData,
+        date: formData.date,
+        categoryId: formData.category,
         amount: amount.toString(),
-        expenseType: 1 // Default expense type
+        account: formData.account,
+        note: formData.note,
+        expenseType: parseInt(formData.expenseType)
       };
 
       await expenseService.updateExpense(id, expenseData);
@@ -104,7 +109,7 @@ const EditExpense = () => {
   return (
     <div className="expense-form-container">
       <div className="expense-form-card">
-        <h1>Edit Expense</h1>
+        <h1>Edit Transaction</h1>
 
         {error && (
           <div className="alert alert-error">
@@ -113,6 +118,20 @@ const EditExpense = () => {
         )}
 
         <form onSubmit={handleSubmit}>
+
+          <div className="form-group">
+            <label htmlFor="expenseType">Type</label>
+            <select
+              id="expenseType"
+              name="expenseType"
+              value={formData.expenseType}
+              onChange={handleChange}
+            >
+              <option value="0">Expense</option>
+              <option value="1">Income</option>
+            </select>
+          </div>
+
           <div className="form-group">
             <label htmlFor="date">Date *</label>
             <input
@@ -136,9 +155,8 @@ const EditExpense = () => {
             >
               <option value="">Select a category</option>
               {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
+                <option key={category.id} value={category.id}>{category.name}</option>
               ))}
-              <option value="Other">Other</option>
             </select>
           </div>
 
@@ -158,15 +176,19 @@ const EditExpense = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="account">Account</label>
-            <input
-              type="text"
+            <label htmlFor="account">Account *</label>
+            <select
               id="account"
               name="account"
               value={formData.account}
               onChange={handleChange}
-              placeholder="e.g., Cash, Credit Card, Bank Account"
-            />
+              required
+            >
+              <option value="">Select an account</option>
+              <option value="Cash">Cash</option>
+              <option value="Card">Card</option>
+              <option value="Bank">Bank Account</option>
+            </select>
           </div>
 
           <div className="form-group">
@@ -200,7 +222,7 @@ const EditExpense = () => {
                   Updating...
                 </>
               ) : (
-                'Update Expense'
+                'Update Transaction'
               )}
             </button>
           </div>

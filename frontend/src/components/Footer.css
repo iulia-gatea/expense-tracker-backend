@@ -1,0 +1,35 @@
+.footer {
+  background-color: var(--secondary-color);
+  color: white;
+  padding: 20px 0;
+  margin-top: auto;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.footer-text {
+  color: var(--primary-color);
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .footer {
+    padding: 15px 0;
+  }
+
+  .footer-container {
+    padding: 0 15px;
+  }
+
+  .footer-text {
+    font-size: 13px;
+  }
+}

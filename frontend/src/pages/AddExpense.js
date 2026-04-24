@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { expenseService } from '../services/api';
+import { expenseService, categoryService } from '../services/api';
 import './ExpenseForm.css';
 
 const AddExpense = () => {
@@ -9,7 +9,8 @@ const AddExpense = () => {
     category: '',
     amount: '',
     account: '',
-    note: ''
+    note: '',
+    expenseType: '0'
   });
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -23,7 +24,7 @@ const AddExpense = () => {
 
   const loadCategories = async () => {
     try {
-      const categoriesData = await expenseService.getExpenseCategories();
+      const categoriesData = await categoryService.getAllCategories();
       setCategories(categoriesData);
     } catch (err) {
       // Categories are optional, so we don't set an error
@@ -57,9 +58,12 @@ const AddExpense = () => {
       }
 
       const expenseData = {
-        ...formData,
+        date: formData.date,
+        categoryId: formData.category,
         amount: amount.toString(),
-        expenseType: 1 // Default expense type
+        account: formData.account,
+        note: formData.note,
+        expenseType: parseInt(formData.expenseType)
       };
 
       await expenseService.createExpense(expenseData);
@@ -74,7 +78,7 @@ const AddExpense = () => {
   return (
     <div className="expense-form-container">
       <div className="expense-form-card">
-        <h1>Add New Expense</h1>
+        <h1>Add New Transaction</h1>
 
         {error && (
           <div className="alert alert-error">
@@ -83,6 +87,20 @@ const AddExpense = () => {
         )}
 
         <form onSubmit={handleSubmit}>
+
+          <div className="form-group">
+            <label htmlFor="expenseType">Type</label>
+            <select
+              id="expenseType"
+              name="expenseType"
+              value={formData.expenseType}
+              onChange={handleChange}
+            >
+              <option value="0">Expense</option>
+              <option value="1">Income</option>
+            </select>
+          </div>
+
           <div className="form-group">
             <label htmlFor="date">Date *</label>
             <input
@@ -106,9 +124,8 @@ const AddExpense = () => {
             >
               <option value="">Select a category</option>
               {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
+                <option key={category.id} value={category.id}>{category.name}</option>
               ))}
-              <option value="Other">Other</option>
             </select>
           </div>
 
@@ -128,15 +145,19 @@ const AddExpense = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="account">Account</label>
-            <input
-              type="text"
+            <label htmlFor="account">Account *</label>
+            <select
               id="account"
               name="account"
               value={formData.account}
               onChange={handleChange}
-              placeholder="e.g., Cash, Credit Card, Bank Account"
-            />
+              required
+            >
+              <option value="">Select an account</option>
+              <option value="Cash">Cash</option>
+              <option value="Card">Card</option>
+              <option value="Bank">Bank Account</option>
+            </select>
           </div>
 
           <div className="form-group">
@@ -170,7 +191,7 @@ const AddExpense = () => {
                   Adding...
                 </>
               ) : (
-                'Add Expense'
+                'Add Transaction'
               )}
             </button>
           </div>

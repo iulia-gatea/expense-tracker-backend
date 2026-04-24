@@ -58,6 +58,11 @@ export const expenseService = {
     return response.data;
   },
 
+  getExpensesByType: async (type) => {
+      const response = await api.get(`/expenses/expense_type/${type}`);
+      return response.data;
+    },
+
   getExpenseById: async (id) => {
     const response = await api.get(`/expenses/${id}`);
     return response.data;
@@ -90,6 +95,29 @@ export const expenseService = {
 
   deleteExpense: async (id) => {
     const response = await api.delete(`/expenses/${id}`);
+    return response.data;
+  },
+};
+
+// Category API
+export const categoryService = {
+  getAllCategories: async () => {
+    const response = await api.get('/categories');
+    return response.data;
+  },
+
+  addCategory: async (category) => {
+    const response = await api.post('/categories', category);
+    return response.data;
+  },
+
+  updateCategory: async (id, category) => {
+    const response = await api.put(`/categories/${id}`, category);
+    return response.data;
+  },
+
+  deleteCategory: async (id) => {
+    const response = await api.delete(`/categories/${id}`);
     return response.data;
   },
 };

@@ -43,8 +43,12 @@ const Login = () => {
 
   return (
     <div className="auth-container">
+
       <div className="auth-card">
-        <h2>Login to Expense Tracker</h2>
+      <div className="auth-logo">
+              <img src="/expense_tracker_logo.svg" alt="Expense Tracker Logo" />
+            </div>
+        <h2>Login</h2>
 
         {error && (
           <div className="alert alert-error">

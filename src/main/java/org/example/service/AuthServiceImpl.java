@@ -4,6 +4,7 @@ import org.example.dto.AppUserDTO;
 import org.example.dto.AuthDTO;
 import org.example.dto.AuthResponseDTO;
 import org.example.model.AppUser;
+import org.example.model.Category;
 import org.example.model.Role;
 import org.example.security.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+
 @Service
 public class AuthServiceImpl implements AuthService{
 
@@ -20,12 +23,14 @@ public class AuthServiceImpl implements AuthService{
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final CategoryService categoryService;
 
-    public AuthServiceImpl(UserService userService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
+    public AuthServiceImpl(UserService userService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtUtil jwtUtil, CategoryService categoryService) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+        this.categoryService = categoryService;
     }
 
     @Override
@@ -47,6 +52,13 @@ public class AuthServiceImpl implements AuthService{
         authDTO.setUsername(appUserDTO.getUsername());
         authDTO.setPassword(appUserDTO.getPassword());
 
+        Arrays.asList("Food", "Transport", "Travel", "Household", "Health",
+                "Social life", "Gift", "Apparel", "Education", "Beauty", "Other").forEach(categoryName -> {
+                    Category category = new Category();
+                    category.setName(categoryName);
+                    category.setUser(appUser);
+                    categoryService.addCategory(category);
+        });
         return loginUser(authDTO);
     }
 

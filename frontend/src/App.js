@@ -7,7 +7,9 @@ import Dashboard from './pages/Dashboard';
 import Expenses from './pages/Expenses';
 import AddExpense from './pages/AddExpense';
 import EditExpense from './pages/EditExpense';
+import Categories from './pages/Categories';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import './App.css';
 
 // Protected Route component
@@ -46,9 +48,15 @@ function App() {
                   <EditExpense />
                 </ProtectedRoute>
               } />
+              <Route path="/categories" element={
+                <ProtectedRoute>
+                  <Categories />
+                </ProtectedRoute>
+              } />
               <Route path="/" element={<Navigate to="/dashboard" />} />
             </Routes>
           </main>
+          <Footer />
         </div>
       </Router>
     </AuthProvider>

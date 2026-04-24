@@ -51,6 +51,9 @@ const Signup = () => {
   return (
     <div className="auth-container">
       <div className="auth-card">
+      <div className="auth-logo">
+        <img src="/expense_tracker_logo.svg" alt="Expense Tracker Logo" />
+      </div>
         <h2>Create Account</h2>
 
         {error && (
