@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.example.dto.ExpenseDTO;
 import org.example.model.AppUser;
 import org.example.model.Category;
@@ -7,11 +8,13 @@ import org.example.model.Expense;
 import org.example.service.CategoryService;
 import org.example.service.ExpenseService;
 import org.example.service.UserService;
+import org.example.utils.UserExpensePDFExporter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -157,5 +160,23 @@ public class ExpenseController {
         AppUser user = userService.findByUsename(username);
 
         return ResponseEntity.ok(expenseService.getExpenseByType(type, user.getId()));
+    }
+
+    @GetMapping("/users/export/pdf")
+    public void exportToPDF(HttpServletResponse response, Authentication authentication) throws IOException {
+        response.setContentType("application/pdf");
+        String currentDateTime = String.valueOf(System.currentTimeMillis());
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=expenses_" + currentDateTime + ".pdf";
+        response.setHeader(headerKey, headerValue);
+
+        String username = authentication.getName();
+        AppUser user = userService.findByUsename(username);
+
+        List<Expense> listExpenses = expenseService.getAllUserExpenses(user.getId());
+
+        UserExpensePDFExporter exporter = new UserExpensePDFExporter(listExpenses);
+        exporter.export(response);
     }
 }
