@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.example.config.CurrentUser;
 import org.example.dto.AppUserDTO;
 import org.example.dto.AuthDTO;
 import org.example.dto.AuthResponseDTO;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 @Service
 public class AuthServiceImpl implements AuthService{
@@ -24,13 +26,15 @@ public class AuthServiceImpl implements AuthService{
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final CategoryService categoryService;
+    private final CurrentUser currentUser;
 
-    public AuthServiceImpl(UserService userService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtUtil jwtUtil, CategoryService categoryService) {
+    public AuthServiceImpl(UserService userService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtUtil jwtUtil, CategoryService categoryService, CurrentUser currentUser) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.categoryService = categoryService;
+        this.currentUser = currentUser;
     }
 
     @Override
@@ -70,8 +74,10 @@ public class AuthServiceImpl implements AuthService{
                             authDTO.getUsername(),
                             authDTO.getPassword()
                     ));
-            final String token = jwtUtil.generateToken(authDTO.getUsername());
-            System.out.println(token);
+
+            AppUser appUser = userService.findByUsename(authDTO.getUsername());
+            currentUser.setCurrentUser(appUser);
+            final String token = jwtUtil.generateToken(Objects.requireNonNull(appUser));
             return new AuthResponseDTO(token, "Success");
         } catch (BadCredentialsException e) {
             return new AuthResponseDTO(null, "Error: invalid username or password");

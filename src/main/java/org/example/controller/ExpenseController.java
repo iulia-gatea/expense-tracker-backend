@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.annotation.CurrentUser;
 import org.example.dto.ExpenseDTO;
 import org.example.model.AppUser;
 import org.example.model.Category;
@@ -11,7 +12,6 @@ import org.example.service.UserService;
 import org.example.utils.UserExpensePDFExporter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -23,37 +23,25 @@ import java.util.Optional;
 @CrossOrigin(origins = "*")
 public class ExpenseController {
     private final ExpenseService expenseService;
-    private final UserService userService;
     private final CategoryService categoryService;
 
-
-    public ExpenseController(ExpenseService expenseService, UserService userService, CategoryService categoryService) {
-        this.userService = userService;
+    public ExpenseController(ExpenseService expenseService, CategoryService categoryService) {
         this.expenseService = expenseService;
         this.categoryService = categoryService;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Expense>> getExpenseById(@PathVariable Long id, Authentication authentication){
-        String username = authentication.getName();
-        AppUser user = userService.findByUsename(username);
-
+    public ResponseEntity<Optional<Expense>> getExpenseById(@PathVariable Long id, @CurrentUser AppUser user) {
         return ResponseEntity.ok(expenseService.getExpenseById(id, user.getId()));
     }
 
     @GetMapping
-    public ResponseEntity<List<Expense>> getExpenses(Authentication authentication){
-        String username = authentication.getName();
-        AppUser user = userService.findByUsename(username);
-
+    public ResponseEntity<List<Expense>> getExpenses(@CurrentUser AppUser user) {
         return ResponseEntity.ok(expenseService.getAllUserExpenses(user.getId()));
     }
 
     @PostMapping
-    public ResponseEntity<Expense> addExpense(@RequestBody ExpenseDTO expenseDTO, Authentication authentication) {
-        String username = authentication.getName();
-        AppUser user = userService.findByUsename(username);
-
+    public ResponseEntity<Expense> addExpense(@RequestBody ExpenseDTO expenseDTO, @CurrentUser AppUser user) {
         // Convert DTO to Expense entity
         Expense expense = new Expense();
         expense.setDate(expenseDTO.getDate());
@@ -77,10 +65,7 @@ public class ExpenseController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Expense> updateExpense(@PathVariable Long id,
-                                                 @RequestBody ExpenseDTO expenseDTO, Authentication authentication) {
-        String username = authentication.getName();
-        AppUser user = userService.findByUsename(username);
-
+                                                 @RequestBody ExpenseDTO expenseDTO, @CurrentUser AppUser user) {
         // Get existing expense
         Optional<Expense> existingExpenseOpt = expenseService.getExpenseById(id, user.getId());
         if (existingExpenseOpt.isEmpty()) {
@@ -113,10 +98,7 @@ public class ExpenseController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Expense> deleteExpense(@PathVariable Long id, Authentication authentication) {
-        String username = authentication.getName();
-        AppUser user = userService.findByUsename(username);
-
+    public ResponseEntity<Expense> deleteExpense(@PathVariable Long id, @CurrentUser AppUser user) {
         HttpStatus httpStatus = expenseService.deleteExpense(id, user.getId())
                 ? HttpStatus.NO_CONTENT
                 : HttpStatus.NOT_FOUND;
@@ -124,9 +106,7 @@ public class ExpenseController {
     }
 
     @GetMapping("/categories")
-    public ResponseEntity<List<String>> getAllExpenseCategories(Authentication authentication){
-        String username = authentication.getName();
-        AppUser user = userService.findByUsename(username);
+    public ResponseEntity<List<String>> getAllExpenseCategories(@CurrentUser AppUser user) {
         List<Category> categories = expenseService.getAllExpenseCategories(user.getId());
 
         if(categories.isEmpty()){
@@ -137,42 +117,30 @@ public class ExpenseController {
     }
 
     @GetMapping("/day/{date}")
-    public ResponseEntity<List<Expense>> getExpenseByDay(@PathVariable String date, Authentication authentication) {
-        String username = authentication.getName();
-        System.out.println("username = " + username);
-        AppUser user = userService.findByUsename(username);
+    public ResponseEntity<List<Expense>> getExpenseByDay(@PathVariable String date, @CurrentUser AppUser user) {
         List<Expense> expenses = expenseService.getExpenseByDate(date, user.getId());
 
         return ResponseEntity.ok(expenses);
     }
 
     @GetMapping("/category/{category}/month")
-    public ResponseEntity<List<Expense>> getExpenseByCategoryIdAndMonth(@PathVariable Long categoryId, @RequestParam String month, Authentication authentication) {
-        String username = authentication.getName();
-        AppUser user = userService.findByUsename(username);
-
+    public ResponseEntity<List<Expense>> getExpenseByCategoryIdAndMonth(@PathVariable Long categoryId, @RequestParam String month, @CurrentUser AppUser user) {
         return ResponseEntity.ok(expenseService.getExpenseByCategoryIdAndMonth(categoryId, month, user.getId()));
     }
 
     @GetMapping("expense_type/{type}")
-    public ResponseEntity<List<Expense>> getExpensesByType(@PathVariable Integer type, Authentication authentication){
-        String username = authentication.getName();
-        AppUser user = userService.findByUsename(username);
-
+    public ResponseEntity<List<Expense>> getExpensesByType(@PathVariable Integer type, @CurrentUser AppUser user) {
         return ResponseEntity.ok(expenseService.getExpenseByType(type, user.getId()));
     }
 
     @GetMapping("/users/export/pdf")
-    public void exportToPDF(HttpServletResponse response, Authentication authentication) throws IOException {
+    public void exportToPDF(HttpServletResponse response, @CurrentUser AppUser user) throws IOException {
         response.setContentType("application/pdf");
         String currentDateTime = String.valueOf(System.currentTimeMillis());
 
         String headerKey = "Content-Disposition";
         String headerValue = "attachment; filename=expenses_" + currentDateTime + ".pdf";
         response.setHeader(headerKey, headerValue);
-
-        String username = authentication.getName();
-        AppUser user = userService.findByUsename(username);
 
         List<Expense> listExpenses = expenseService.getAllUserExpenses(user.getId());
 
