@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.example.config.CurrentUser;
 import org.example.model.AppUser;
 import org.example.model.Category;
 import org.example.model.Role;
@@ -62,19 +63,18 @@ public class CategoryControllerTest {
         updatedCategory = new Category();
         updatedCategory.setName("Updated Food");
 
-
+        CurrentUser currentUser = new CurrentUser();
+        currentUser.setCurrentUser(testUser);
     }
 
     @Test
     public void testGetCategories_ShouldReturnAllUserCategories() {
         // Arrange
         List<Category> categories = Arrays.asList(category, category2);
-        when(authentication.getName()).thenReturn("testuser");
-        when(userService.findByUsename("testuser")).thenReturn(testUser);
         when(categoryService.getAllUserCategories(1L)).thenReturn(categories);
 
         // Act
-        ResponseEntity<List<Category>> response = categoryController.getCategories(authentication);
+        ResponseEntity<List<Category>> response = categoryController.getCategories(testUser);
 
         // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -86,12 +86,10 @@ public class CategoryControllerTest {
     @Test
     public void testAddCategory_ShouldReturnCreatedExpense() {
         // Arrange
-        when(authentication.getName()).thenReturn("testuser");
-        when(userService.findByUsename("testuser")).thenReturn(testUser);
         when(categoryService.addCategory(any(Category.class))).thenReturn(category);
 
         // Act
-        ResponseEntity<Category> response = categoryController.addCategory(category, authentication);
+        ResponseEntity<Category> response = categoryController.addCategory(category, testUser);
 
         // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -103,13 +101,11 @@ public class CategoryControllerTest {
     @Test
     public void testUpdateCategory_WithValidExpense_ShouldReturnUpdatedExpense() {
         // Arrange
-        when(authentication.getName()).thenReturn("testuser");
-        when(userService.findByUsename("testuser")).thenReturn(testUser);
 //        when(categoryService.getCategoryById(1L, 1L)).thenReturn(Optional.ofNullable(category));
         when(categoryService.updateCategory(any(Category.class), eq(1L))).thenReturn(true);
 
         // Act
-        ResponseEntity<Category> response = categoryController.updateCategory(1L, updatedCategory, authentication);
+        ResponseEntity<Category> response = categoryController.updateCategory(1L, updatedCategory, testUser);
 
         // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -121,12 +117,10 @@ public class CategoryControllerTest {
 //    @MockitoSettings(strictness = Strictness.LENIENT)
     public void testUpdateCategory_WithInvalidExpense_ShouldReturnNotFound() {
         // Arrange
-        when(authentication.getName()).thenReturn("testuser");
-        when(userService.findByUsename("testuser")).thenReturn(testUser);
 //        when(categoryService.getCategoryById(999L, 1L)).thenReturn(Optional.empty());
 
         // Act
-        ResponseEntity<Category> response = categoryController.updateCategory(999L, updatedCategory, authentication);
+        ResponseEntity<Category> response = categoryController.updateCategory(999L, updatedCategory, testUser);
 
         // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -135,12 +129,10 @@ public class CategoryControllerTest {
     @Test
     public void testDeleteCategory_WithValidExpense_ShouldReturnNoContent() {
         // Arrange
-        when(authentication.getName()).thenReturn("testuser");
-        when(userService.findByUsename("testuser")).thenReturn(testUser);
         when(categoryService.deleteCategory(1L, 1L)).thenReturn(true);
 
         // Act
-        ResponseEntity<Category> response = categoryController.deleteCategory(1L, authentication);
+        ResponseEntity<Category> response = categoryController.deleteCategory(1L, testUser);
 
         // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -150,12 +142,10 @@ public class CategoryControllerTest {
     @Test
     public void testDeleteCategory_WithInvalidExpense_ShouldReturnNotFound() {
         // Arrange
-        when(authentication.getName()).thenReturn("testuser");
-        when(userService.findByUsename("testuser")).thenReturn(testUser);
         when(categoryService.deleteCategory(999L, 1L)).thenReturn(false);
 
         // Act
-        ResponseEntity<Category> response = categoryController.deleteCategory(999L, authentication);
+        ResponseEntity<Category> response = categoryController.deleteCategory(999L, testUser);
 
         // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);

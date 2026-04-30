@@ -69,7 +69,7 @@ public class AuthServiceImpl implements AuthService{
     @Override
     public AuthResponseDTO loginUser(AuthDTO authDTO) {
         try{
-            Authentication authentication = authenticationManager
+            authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(
                             authDTO.getUsername(),
                             authDTO.getPassword()
@@ -77,7 +77,7 @@ public class AuthServiceImpl implements AuthService{
 
             AppUser appUser = userService.findByUsename(authDTO.getUsername());
             currentUser.setCurrentUser(appUser);
-            final String token = jwtUtil.generateToken(Objects.requireNonNull(appUser));
+            final String token = jwtUtil.generateToken(authDTO.getUsername());
             return new AuthResponseDTO(token, "Success");
         } catch (BadCredentialsException e) {
             return new AuthResponseDTO(null, "Error: invalid username or password");
