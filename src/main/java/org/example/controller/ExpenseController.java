@@ -8,12 +8,16 @@ import org.example.model.Category;
 import org.example.model.Expense;
 import org.example.service.CategoryService;
 import org.example.service.ExpenseService;
-import org.example.service.UserService;
+import org.example.utils.ExpenseDataImporter;
 import org.example.utils.UserExpensePDFExporter;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -146,5 +150,34 @@ public class ExpenseController {
 
         UserExpensePDFExporter exporter = new UserExpensePDFExporter(listExpenses);
         exporter.export(response);
+    }
+
+    @PostMapping("/import")
+    public String importExpenses(@RequestParam(name = "file") @NonNull MultipartFile file, @CurrentUser AppUser user) throws IOException {
+        // Setting up the path of the file
+        String filePath = System.getProperty("user.dir") + "/uploads" + File.separator + file.getOriginalFilename();
+        String fileUploadStatus;
+
+        // Try block to check exceptions
+        try {
+            // Creating an object of FileOutputStream class
+            FileOutputStream fout = new FileOutputStream(filePath);
+            fout.write(file.getBytes());
+
+            // Closing the connection
+            fout.close();
+
+            ExpenseDataImporter importer = new ExpenseDataImporter(categoryService, expenseService);
+            importer.importFile(filePath, user);
+
+            fileUploadStatus = "File Imported Successfully";
+        }
+
+        // Catch block to handle exceptions
+        catch (Exception e) {
+            e.printStackTrace();
+            fileUploadStatus =  "Error in uploading file: " + e;
+        }
+        return fileUploadStatus;
     }
 }
